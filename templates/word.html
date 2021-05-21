@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Maōri Dictionary | {{ words[0][1] }}{% endblock %}
+
+{% block heading %}Maōri - English Dictionary{% endblock %}
+
+{% block main %}
+
+
+        <h1>{{ words[0][1] }}({{ words[0][2] }})</h1>
+
+
+    <table>
+
+        {%  for word in words %}
+
+            <tr>
+                <th>Category</th><td><p>{{ cat_name_list[0][1] }}</p></td>
+            </tr>
+            <tr>
+                <th>Definition</th><td><p>{{ word[4] }}</p></td>
+            </tr>
+            <tr>
+                <th>Word Level</th><td><p>{{ word[5] }}</p></td>
+            </tr>
+            <tr>
+                <th>User Added</th><td><p>{{ word[6] }}</p></td>
+            </tr>
+            <tr>
+                <th>Image</th><td><img alt="word_image" src="/static/images/{{ word[7] }}"></td>
+            </tr>
+            <tr>
+                <th>Date Added</th><td><p>{{ word[8] }}</p></td>
+            </tr>
+
+        {%  endfor %}
+
+    </table>
+
+{% endblock %}
