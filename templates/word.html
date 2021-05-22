@@ -7,7 +7,7 @@
 {% block main %}
 
 
-        <h1>{{ words[0][1] }}({{ words[0][2] }})</h1>
+        <h1>{{ words[0][1] }} ({{ words[0][2] }})</h1>
 
 
     <table>
@@ -24,7 +24,7 @@
                 <th>Word Level</th><td><p>{{ word[5] }}</p></td>
             </tr>
             <tr>
-                <th>User Added</th><td><p>{{ word[6] }}</p></td>
+                <th>User Added</th><td><p>{{ user_name_list[0][1] }} {{ user_name_list[0][2] }}</p></td>
             </tr>
             <tr>
                 <th>Image</th><td><img alt="word_image" src="/static/images/{{ word[7] }}"></td>

@@ -34,6 +34,16 @@
                         </a>
                     {% endfor %}
                 </li>
+                <li>
+                    <p>------</p>
+                </li>
+                <li>
+                    {% if logged_in %}
+                        <a href="/logout">log out</a>
+                    {%  else %}
+                        <a href="/login">log in</a>
+                    {%  endif %}
+                </li>
 			</ul>
 		</nav>
 
