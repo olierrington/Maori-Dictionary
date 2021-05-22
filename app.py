@@ -38,7 +38,7 @@ def render_homepage():
         category = request.form['category'].strip().title()
 
         if len(category) > 20:
-            return redirect("/?error=Category+cannot+be+longer+than+20+characters.")
+            return redirect("?error=Category+cannot+be+longer+than+20+characters.")
         else:
             # connect to the database
             con = create_connection(DB_NAME)
@@ -50,7 +50,7 @@ def render_homepage():
             try:
                 cur.execute(query, (category, ))  # this line actually executes the query
             except:
-                return redirect('/?error=Unknown+error')
+                return redirect('/error=Unknown+error')
 
             con.commit()
             con.close()
@@ -80,13 +80,13 @@ def render_category(cat_id):
         date_added = request.form['date_added']
 
         if len(maori) > 20:
-            return redirect("/?error=Maori+word+cannot+be+longer+than+20+characters.")
+            return redirect("?error=Maori+word+cannot+be+longer+than+20+characters.")
         elif len(english) > 20:
-            return redirect("/?error=English+word+cannot+be+longer+than+20+characters.")
+            return redirect("?error=English+word+cannot+be+longer+than+20+characters.")
         elif len(definition) < 5:
-            return redirect("/?error=Definition+cannot+be+less+than+5+characters.")
+            return redirect("?error=Definition+cannot+be+less+than+5+characters.")
         elif len(date_added) > 10:
-            return redirect("/?error=Date+cannot+be+longer+than+10+characters.")
+            return redirect("?error=Date+cannot+be+longer+than+10+characters.")
         else:
             # connect to the database
             con = create_connection(DB_NAME)
@@ -99,7 +99,7 @@ def render_category(cat_id):
             try:
                 cur.execute(query, (maori, english, cat_id, definition, word_level, session['user_id'], date_added))  # this line actually executes the query
             except:
-                return redirect('/?error=Unknown+error')
+                return redirect('?error=Unknown+error')
 
             con.commit()
             con.close()
