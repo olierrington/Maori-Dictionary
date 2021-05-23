@@ -7,7 +7,7 @@
 {% block main %}
 
 
-        <h1>{{ words[0][1] }} ({{ words[0][2] }})</h1>
+    <h1>{{ words[0][1] }} ({{ words[0][2] }})</h1>
 
 
     <table>
@@ -36,5 +36,22 @@
         {%  endfor %}
 
     </table>
+
+
+    {% if logged_in %}
+        <form class="dataform" method="post">
+            <h3>DELETE WORD {{ words[0][1] }}</h3>
+            <div>
+                <div><label for="email">Confirm by entering email:</label></div>
+                <div><input type="text" name="email" id="email" required></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="submit" value="CONFIRM DELETE"></div>
+            </div>
+        </form>
+    {% endif %}
+
 
 {% endblock %}

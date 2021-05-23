@@ -138,9 +138,18 @@ def render_category(cat_id):
                            cat_name_list=cat_name_list, logged_in=is_logged_in())
 
 
-@app.route('/word/<word_id>')
+@app.route('/word/<word_id>', methods=["GET", "POST"])
 # specific word
 def render_word(word_id):
+    # delete current word
+    if request.method == "POST" and is_logged_in():
+        email = request.form['email']  # gets input from form
+
+        if email != session['email']:  # data validation
+            return redirect("?error=Email+is+incorrect.")
+        else:  # if email is correct then delete word
+            return redirect('/confirmdeleteword/{}'.format(word_id))
+
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
     query = "SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added" \
@@ -173,6 +182,65 @@ def render_word(word_id):
     con.close()
 
     return render_template('word.html', words=word_list, categories=category_list,
+                           cat_name_list=cat_name_list, logged_in=is_logged_in(),
+                           user_name_list=user_name_list)
+
+
+@app.route('/confirmdeleteword/<word_id>', methods=["GET", "POST"])
+# delete word
+def render_confirmdeleteword_page(word_id):
+    if request.method == "POST" and is_logged_in():
+        email = request.form['email']  # gets input from form
+
+        if email != session['email']:  # data validation
+            return redirect("?error=Email+is+incorrect.")
+        else:
+            con = create_connection(DB_NAME)  # connect to db
+
+            query = "DELETE FROM words WHERE word_id=?"
+
+            cur = con.cursor()
+            try:
+                cur.execute(query, (word_id,))  # executes the query
+            except:
+                return redirect('/error=Unknown+error')  # in case of an expected error
+
+            con.commit()
+            con.close()
+            return redirect('/')  # return home
+
+    # connect to the database to select information on selected word
+    con = create_connection(DB_NAME)
+    query = "SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added" \
+            " FROM words WHERE word_id=? ORDER BY maori ASC"
+    cur = con.cursor()
+    cur.execute(query, (word_id,))  # execute query
+    word_list = cur.fetchall()  # put results in list
+
+    # connect to the database to get categories for navigation
+    query = "SELECT cat_id, category " \
+            "FROM categories ORDER BY category ASC"
+    cur = con.cursor()
+    cur.execute(query)  # execute query
+    category_list = cur.fetchall()  # put results in list
+
+    # connect to the database to select category name of selected word
+    query = "SELECT cat_id, category " \
+            "FROM categories WHERE cat_id=?"
+    cur = con.cursor()
+    cur.execute(query, (word_list[0][3],))  # execute query
+    cat_name_list = cur.fetchall()  # put results in list
+
+    # connect to the database to select the users details that added selected work
+    query = "SELECT user_id, fname, lname " \
+            "FROM users WHERE user_id=?"
+    cur = con.cursor()
+    cur.execute(query, (word_list[0][6],))  # execute query
+    user_name_list = cur.fetchall()  # put results in list
+
+    con.close()
+
+    return render_template('confirmdeleteword.html', words=word_list, categories=category_list,
                            cat_name_list=cat_name_list, logged_in=is_logged_in(),
                            user_name_list=user_name_list)
 

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Maōri Dictionary | DELETE {{ words[0][1] }}{% endblock %}
+
+{% block heading %}Maōri - English Dictionary{% endblock %}
+
+{% block main %}
+
+    {% if logged_in %}
+        <h1>Confirm Delete {{ words[0][1] }} ({{ words[0][2] }})</h1>
+
+
+        <form class="dataform" method="post">
+            <h3>Delete Word {{ words[0][1] }}</h3>
+            <p style="color: red">WARNING: This action cannot be undone<br><br></p>
+            <div>
+                <div><label for="email">Re-enter email:</label></div>
+                <div><input type="text" name="email" id="email" required></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="submit" value="CONFIRM DELETE"></div>
+            </div>
+        </form>
+    {% endif %}
+
+
+{% endblock %}
