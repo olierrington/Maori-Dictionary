@@ -1,12 +1,12 @@
-
 <!doctype html>
 <html lang="en">
+
 <head>
 	<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Suez+One&display=swap" rel="stylesheet">
 	<title>{% block title %}{% endblock %}</title>
-	<meta name="Description" content="Author: D Benseman, Content: A dictionary to convert maori words to english.">
+	<meta name="Description" content="Author: O Errington, Content: A dictionary to convert Maori words to English.">
 </head>
 
 <body>
@@ -18,12 +18,12 @@
 
 		<nav>
             <input type="checkbox" name="drop_down_menu" />
-			<span></span>
+            <span></span>
 			<span></span>
 			<span></span>
 			<ul>
                 <li>
-                    <a href="\">
+                    <a href="/">
                         Home
                     </a>
                 </li>
@@ -46,13 +46,6 @@
                 </li>
 			</ul>
 		</nav>
-
-
-		<!--
-		=====================================================
-		== Content row of the template.                 ==
-		=====================================================
-		-->
 
 		<main>
             {% block main%}{% endblock %}

@@ -5,7 +5,11 @@
 {% block heading %}Maōri - English Dictionary{% endblock %}
 
 {% block main %}
-
+    {%  if logged_in %}
+        <h1>Kia Ora {{ session.fname }}.</h1>
+    {%  else %}
+        <h1>Kia Ora.</h1>
+    {%  endif %}
     <p>
         Tēnā koe. Nau mai ki Te Aka. Welcome to the online Te Aka Māori-English, English-Māori Dictionary and Index. This online Māori dictionary is aimed at providing quick access to definitions of commonly used Māori words.
     </p>
