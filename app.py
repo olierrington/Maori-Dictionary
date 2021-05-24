@@ -125,12 +125,16 @@ def render_category(cat_id):
     cur.execute(query)  # this line actually executes the query
     category_list = cur.fetchall()  # puts the results into a list usable in python
 
-    # connect to the database to select only the selected category
-    query = "SELECT cat_id, category " \
-            "FROM categories WHERE cat_id=?"
-    cur = con.cursor()
-    cur.execute(query, (word_list[0][3],))  # execute query
-    cat_name_list = cur.fetchall()  # puts results into list
+    try:
+        # connect to the database to select only the selected category
+        query = "SELECT cat_id, category " \
+                "FROM categories WHERE cat_id=?"
+        cur = con.cursor()
+        cur.execute(query, (word_list[0][3],))  # execute query
+        cat_name_list = cur.fetchall()  # puts results into list
+    except:
+        cat_name_list = 'none'
+        pass
 
     con.close()
 
@@ -224,12 +228,15 @@ def render_confirmdeleteword_page(word_id):
     cur.execute(query)  # execute query
     category_list = cur.fetchall()  # put results in list
 
-    # connect to the database to select category name of selected word
-    query = "SELECT cat_id, category " \
-            "FROM categories WHERE cat_id=?"
-    cur = con.cursor()
-    cur.execute(query, (word_list[0][3],))  # execute query
-    cat_name_list = cur.fetchall()  # put results in list
+    try:
+        # connect to the database to select category name of selected word
+        query = "SELECT cat_id, category " \
+                "FROM categories WHERE cat_id=?"
+        cur = con.cursor()
+        cur.execute(query, (word_list[0][3],))  # execute query
+        cat_name_list = cur.fetchall()  # put results in list
+    except:
+        pass
 
     # connect to the database to select the users details that added selected work
     query = "SELECT user_id, fname, lname " \
