@@ -2,16 +2,23 @@
 
 {% block title %}Maōri Dictionary | Home{% endblock %}
 
-{% block heading %}Maōri - English Dictionary{% endblock %}
-
 {% block main %}
     {%  if logged_in %}
-        <h1>Kia Ora {{ session.fname }}.</h1>
+        <h2>Kia Ora {{ session.fname }}.</h2>
     {%  else %}
-        <h1>Kia Ora.</h1>
+        <h2>Kia Ora.</h2>
     {%  endif %}
     <p>
-        Tēnā koe. Nau mai ki Te Aka. Welcome to the online Te Aka Māori-English, English-Māori Dictionary and Index. This online Māori dictionary is aimed at providing quick access to definitions of commonly used Māori words.
+        Tēnā koe. Nau mai ki Te Aka. Welcome to the online Te Aka Māori-English,
+        English-Māori Dictionary and Index. This online Māori dictionary is aimed
+        at providing quick access to definitions of commonly used Māori words.
+        <br><br>
+        Māori, also known as te reo ('the language'), is an Eastern Polynesian
+        language spoken by the Māori people, the indigenous population of New Zealand.
+        It gained recognition as one of New Zealand's official languages in 1987.
+        The number of speakers of the language has declined sharply since 1945,but a
+        Māori-language revitalisation effort slowed the decline, and the language
+        has experienced a revival, particularly since about 2015.
     </p>
 
     {% if logged_in %}

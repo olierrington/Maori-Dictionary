@@ -2,12 +2,10 @@
 
 {% block title %}Maōri Dictionary | {{ words[0][1] }}{% endblock %}
 
-{% block heading %}Maōri - English Dictionary{% endblock %}
-
 {% block main %}
 
 
-    <h1>{{ words[0][1] }} ({{ words[0][2] }})</h1>
+    <h2>{{ words[0][1] }} ({{ words[0][2] }})</h2>
 
 
     <table>
@@ -40,7 +38,7 @@
 
     {% if logged_in %}
         <form class="dataform" method="post">
-            <h3>DELETE WORD {{ words[0][1] }}</h3>
+            <h3>Delete Word: {{ words[0][1] }}</h3>
             <div>
                 <div><label for="email">Confirm by entering email:</label></div>
                 <div><input type="text" name="email" id="email" required></div>

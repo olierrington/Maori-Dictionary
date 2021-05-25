@@ -1,8 +1,13 @@
 * {
-    font-family: Comfortaa, sans-serif;
+    font-family: 'KoHo', sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-weight: 400;
+}
+
+body {
+    background-color: indianred;
 }
 
 #container {
@@ -13,7 +18,7 @@
 
 header {
     grid-area: header;
-    background-color: #f00;
+    background-color: indianred;
     padding: 1rem;
 }
 
@@ -29,9 +34,19 @@ main {
 
 h1, h2, h3, h4 {
     padding: 1rem 0;
-    font-family: 'Suez One', serif;
-    color: #000;
-    text-shadow: 2px 2px 4px #fff;
+    font-weight: 700;
+    font-size: 2rem;
+    color: black;
+}
+
+h1 {
+    font-size: 4rem;
+    color: white;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: white;
 }
 
 p {
@@ -48,33 +63,36 @@ img {
 }
 .dataform {
     margin: 1rem 0;
-    border: 1px solid #999;
+    border: 0px;
     padding: 1rem;
-    background-color: #fcc;
-    border-radius: 10px;
+    background-color: indianred;
+    border-radius: 5px;
 }
 
-.dataform input, textarea {
+.dataform label {
+    color: white;
+}
+
+.dataform div {
+    margin: 0.8rem 0 0.8rem 0;
+}
+
+.dataform input {
     width: 100%;
-    border-radius: 10px;
-    padding: 0.3rem;
-    margin-bottom: 10px;
-}
-
-.dataform p input {
-    display: inline;
-    width: 1rem;
-    margin-left: 0.5rem;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-bottom: 12px;
+    font-size: 1rem;
 }
 
 .error {
     color: #f00;
+    font-size: 1.5rem;
 }
 
-.login {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 2px dashed #fff;
+.message {
+    color: green;
+    font-size: 1.5rem;
 }
 
 table {
@@ -89,32 +107,34 @@ th, td {
     text-align: left;
 }
 
+b {
+    font-weight: 700;
+}
+
 #category-highlight:hover {
-    background-color: #f00;
+    background-color: #cd5c5c;
 }
 
 th {
-    background-color: #000;
+    background-color: indianred;
     color: #fff;
+    font-weight: 700;
 }
 
 img .thumb {
     max-width: 90px;
 }
+
+img {
+    max-width: 550px;
+    width: 100%;
+    min-width: 400px;
+}
+
 footer {
     grid-area: footer;
     padding: 1rem;
-    background-color: #f00;
-}
-
-footer p {
-    color: #000;
-    text-shadow: 2px 2px 4px #fff;
-    font-size: 1.5rem;
-}
-
-footer img {
-    float: right;
+    background-color: indianred;
 }
 
 @media only screen and (max-width: 768px) {
@@ -134,13 +154,13 @@ footer img {
     nav a
     {
       text-decoration: none;
-      color: #232323;
+      color: white;
       transition: color 0.3s ease;
     }
 
     nav a:hover
     {
-      color: tomato;
+      color: black;
     }
 
 
@@ -172,7 +192,7 @@ footer img {
       margin-bottom: 5px;
       position: relative;
 
-      background: #000;
+      background: white;
       border-radius: 3px;
 
       z-index: 1;
@@ -202,7 +222,7 @@ footer img {
     {
       opacity: 1;
       transform: rotate(45deg) translate(-2px, -1px);
-      background: #000;
+      background: white;
     }
 
     /*
@@ -233,7 +253,7 @@ footer img {
       margin: -100px 0 0 -50px;
       padding: 125px 50px 50px;
 
-        background: #ed9999;
+        background-color: indianred;
       list-style-type: none;
       -webkit-font-smoothing: antialiased;
       /* to stop flickering of text in safari */
@@ -265,24 +285,23 @@ footer img {
     }
 
     nav {
-        background: linear-gradient(180deg, rgba(255,0,0,1) 0%, rgba(0, 0, 0, 1) 50%,  rgba(255,0,0,1) 100%);
-        padding: 0.5rem;
+        background-color: indianred;
+        padding: 0rem 0.5rem;
     }
 
     nav ul {
         list-style: none;
     }
-    nav li {
-        padding: 0.2rem 0;
-    }
     nav a {
+        display: block;
         color: #fff;
         text-decoration: none;
+        padding: 0.35rem 0rem 0.35rem 0.45rem;
     }
 
     nav a:hover {
-        color: #000;
-        background-color: #fff;
+        background-color: #edd;
+        color: indianred;
     }
     nav input, nav span {
         visibility: hidden;

@@ -4,7 +4,8 @@
 <head>
 	<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Suez+One&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=KoHo:wght@400;700&display=swap" rel="stylesheet">
 	<title>{% block title %}{% endblock %}</title>
 	<meta name="Description" content="Author: O Errington, Content: A dictionary to convert Maori words to English.">
 </head>
@@ -13,7 +14,7 @@
 	<div id="container">
 
 		<header>
-			<h1>{% block heading %}{% endblock %}</h1>
+			<h1>Māori Dictionary</h1>
 		</header>
 
 		<nav>
@@ -24,38 +25,39 @@
 			<ul>
                 <li>
                     <a href="/">
-                        Home
+                        <b>Home</b><br>
                     </a>
-                </li>
-                <li>
+                    {% if logged_in %}
+                        <a href="/logout"><b>Log Out</b><br></a>
+                    {%  else %}
+                        <a href="/login"><b>Login</b><br></a>
+                    {%  endif %}
                     {% for category in categories %}
                         <a href="/category/{{ category[0] }}">
                             {{ category[1] }} <br/>
                         </a>
                     {% endfor %}
-                </li>
-                <li>
-                    <p style="color: white">------</p>
-                </li>
-                <li>
-                    {% if logged_in %}
-                        <a href="/logout">Log Out</a>
-                    {%  else %}
-                        <a href="/login">Log In</a>
-                    {%  endif %}
+                    <br><br>
                 </li>
 			</ul>
 		</nav>
 
 		<main>
+
+            {% if request.args.get('error') %}
+                <p class="error">{{ request.args.get('error') }}</p>
+            {% endif %}
+            {% if request.args.get('message') %}
+                <p class="message">{{ request.args.get('message') }}</p>
+            {% endif %}
             {% block main%}{% endblock %}
         </main>
 
 
 		<footer>
-			<p>
+			<h3>
 				&copy; O T ERRINGTON 2021
-			</p>
+			</h3>
 		</footer>
 
 	</div>

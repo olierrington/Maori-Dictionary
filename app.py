@@ -54,21 +54,13 @@ def render_homepage():
             cur = con.cursor()
             try:
                 cur.execute(query, (category,))  # executes the query into db
-            except:
+            except sqlite3.Error:
                 return redirect('/error=Unknown+error')  # in case of an expected error
 
             con.commit()
             con.close()
 
-    # connect to db to get categories for navigation menu
-    con = create_connection(DB_NAME)
-    query = "SELECT cat_id, category FROM categories ORDER BY category ASC"
-    cur = con.cursor()
-    cur.execute(query)  # execute query
-    con.close()
-
-    category_list = get_categories()
-    return render_template('home.html', categories=category_list, logged_in=is_logged_in())
+    return render_template('home.html', categories=get_categories(), logged_in=is_logged_in())
 
 
 @app.route('/category/<cat_id>', methods=["GET", "POST"])
@@ -103,42 +95,30 @@ def render_category(cat_id):
             cur = con.cursor()
             try:  # try to execute query
                 cur.execute(query, (maori, english, cat_id, definition, word_level, session['user_id'], date_added))
-            except:  # catch unexpected errors
+            except sqlite3.Error:  # catch unexpected errors
                 return redirect('?error=Unknown+error')
 
             con.commit()
             con.close()
 
-    # connect to the database to select words in specific category
     con = create_connection(DB_NAME)
+    # connect to the database to select words in specific category
     query = "SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added" \
             " FROM words WHERE cat_id=? ORDER BY maori ASC"
     cur = con.cursor()
     cur.execute(query, (cat_id,))  # execute query
     word_list = cur.fetchall()  # puts results into list
 
-    # connect to the database for categories for the navigation
-    con = create_connection(DB_NAME)
+    # connect to the database to select only the selected category
     query = "SELECT cat_id, category " \
-            "FROM categories ORDER BY category ASC"
-    cur = con.cursor()  # You need this line next
-    cur.execute(query)  # this line actually executes the query
-    category_list = cur.fetchall()  # puts the results into a list usable in python
-
-    try:
-        # connect to the database to select only the selected category
-        query = "SELECT cat_id, category " \
-                "FROM categories WHERE cat_id=?"
-        cur = con.cursor()
-        cur.execute(query, (word_list[0][3],))  # execute query
-        cat_name_list = cur.fetchall()  # puts results into list
-    except:
-        cat_name_list = 'none'
-        pass
+            "FROM categories WHERE cat_id=?"
+    cur = con.cursor()
+    cur.execute(query, (cat_id,))  # execute query
+    cat_name_list = cur.fetchall()  # puts results into list
 
     con.close()
 
-    return render_template('category.html', words=word_list, categories=category_list,
+    return render_template('category.html', words=word_list, categories=get_categories(),
                            cat_name_list=cat_name_list, logged_in=is_logged_in())
 
 
@@ -162,13 +142,6 @@ def render_word(word_id):
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
 
-    # connect to the database to get categories for navigation
-    query = "SELECT cat_id, category " \
-            "FROM categories ORDER BY category ASC"
-    cur = con.cursor()
-    cur.execute(query)  # execute query
-    category_list = cur.fetchall()  # put results in list
-
     # connect to the database to select category name of selected word
     query = "SELECT cat_id, category " \
             "FROM categories WHERE cat_id=?"
@@ -185,7 +158,7 @@ def render_word(word_id):
 
     con.close()
 
-    return render_template('word.html', words=word_list, categories=category_list,
+    return render_template('word.html', words=word_list, categories=get_categories(),
                            cat_name_list=cat_name_list, logged_in=is_logged_in(),
                            user_name_list=user_name_list)
 
@@ -194,24 +167,19 @@ def render_word(word_id):
 # delete word
 def render_confirmdeleteword_page(word_id):
     if request.method == "POST" and is_logged_in():
-        email = request.form['email']  # gets input from form
+        con = create_connection(DB_NAME)  # connect to db
 
-        if email != session['email']:  # data validation
-            return redirect("?error=Email+is+incorrect.")
-        else:
-            con = create_connection(DB_NAME)  # connect to db
+        query = "DELETE FROM words WHERE word_id=?"
 
-            query = "DELETE FROM words WHERE word_id=?"
+        cur = con.cursor()
+        try:
+            cur.execute(query, (word_id,))  # executes the query
+        except sqlite3.Error:
+            return redirect('/error=Unknown+error')  # in case of an expected error
 
-            cur = con.cursor()
-            try:
-                cur.execute(query, (word_id,))  # executes the query
-            except:
-                return redirect('/error=Unknown+error')  # in case of an expected error
-
-            con.commit()
-            con.close()
-            return redirect('/')  # return home
+        con.commit()
+        con.close()
+        return redirect('/?message=Word+successfully+deleted')  # return home
 
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
@@ -220,23 +188,6 @@ def render_confirmdeleteword_page(word_id):
     cur = con.cursor()
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
-
-    # connect to the database to get categories for navigation
-    query = "SELECT cat_id, category " \
-            "FROM categories ORDER BY category ASC"
-    cur = con.cursor()
-    cur.execute(query)  # execute query
-    category_list = cur.fetchall()  # put results in list
-
-    try:
-        # connect to the database to select category name of selected word
-        query = "SELECT cat_id, category " \
-                "FROM categories WHERE cat_id=?"
-        cur = con.cursor()
-        cur.execute(query, (word_list[0][3],))  # execute query
-        cat_name_list = cur.fetchall()  # put results in list
-    except:
-        pass
 
     # connect to the database to select the users details that added selected work
     query = "SELECT user_id, fname, lname " \
@@ -247,16 +198,15 @@ def render_confirmdeleteword_page(word_id):
 
     con.close()
 
-    return render_template('confirmdeleteword.html', words=word_list, categories=category_list,
-                           cat_name_list=cat_name_list, logged_in=is_logged_in(),
-                           user_name_list=user_name_list)
+    return render_template('confirmdeleteword.html', words=word_list, categories=get_categories(),
+                           logged_in=is_logged_in(), user_name_list=user_name_list)
 
 
 @app.route('/login', methods=["GET", "POST"])
 # login
 def render_login_page():
     if is_logged_in():
-        return redirect('/')  # if already logged in re-direct to home
+        return redirect('/?message=You+are+already+logged+in')  # if already logged in re-direct to home
     print(request.form)
 
     # logging in
@@ -295,23 +245,14 @@ def render_login_page():
         print(session)
         return redirect('/')
 
-    # connect to the database to egt categories for navigation
-    con = create_connection(DB_NAME)
-    query = "SELECT cat_id, category FROM categories ORDER BY category ASC"
-    cur = con.cursor()
-    cur.execute(query)  # execute query
-    con.close()
-
-    category_list = get_categories()
-
-    return render_template('login.html', logged_in=is_logged_in(), categories=category_list)
+    return render_template('login.html', logged_in=is_logged_in(), categories=get_categories())
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 # sign up
 def render_signup_page():
     if is_logged_in():  # if already logged in then go home
-        return redirect('/')
+        return redirect('/You+are+already+logged+in')
 
     if request.method == 'POST':
         print(request.form)
@@ -344,18 +285,9 @@ def render_signup_page():
 
         con.commit()
         con.close()
-        return redirect('/login')
+        return redirect('/login?message=Successfully+created+an+account.+Please+sign+in+to+continue')
 
-    # connect to the database to get categories for navigation
-    con = create_connection(DB_NAME)
-    query = "SELECT cat_id, category FROM categories ORDER BY category ASC"
-    cur = con.cursor()
-    cur.execute(query)  # execute query
-    con.close()
-
-    category_list = get_categories()
-
-    return render_template('signup.html', logged_in=is_logged_in(), categories=category_list)
+    return render_template('signup.html', logged_in=is_logged_in(), categories=get_categories())
 
 
 @app.route('/logout')
