@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Maōri Dictionary | {{ words[0][1] }}{% endblock %}
+{% block title %}Māori Dictionary | {{ words[0][1] }}{% endblock %}
 
 {% block main %}
 
@@ -38,16 +38,13 @@
 
     {% if logged_in %}
         <form class="dataform" method="post">
-            <h3>Delete Word: {{ words[0][1] }}</h3>
-            <div>
-                <div><label for="email">Confirm by entering email:</label></div>
-                <div><input type="text" name="email" id="email" required></div>
-            </div>
+            <h3>Edit Word: {{ words[0][1] }}</h3>
 
             <div>
                 <div></div>
-                <div><input type="submit" value="CONFIRM DELETE"></div>
+                <div><input type="button" value="EDIT" onclick="window.location.href='/editword/{{ words[0][0] }}'"></div>
             </div>
+
         </form>
     {% endif %}
 

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, flash, render_template, request, session, redirect
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
@@ -27,8 +27,9 @@ def create_connection(db_file):
 def get_categories():
     # get categories from db and store them as category_list
     con = create_connection(DB_NAME)
-    query = "SELECT cat_id, category" \
-            " FROM categories ORDER BY category ASC"
+    query = """SELECT cat_id, category 
+            FROM categories 
+            ORDER BY category ASC"""
     cur = con.cursor()
     cur.execute(query)
     category_list = cur.fetchall()
@@ -44,23 +45,69 @@ def render_homepage():
         category = request.form['category'].strip().title()  # gets input from form
 
         if len(category) > 20:  # data validation
-            return redirect("?error=Category+cannot+be+longer+than+20+characters.")
+            flash('Category cannot be longer than 20 characters')
+            return redirect(request.referrer)
         else:  # if form inputs are good then upload it
             con = create_connection(DB_NAME)  # connect to db
 
-            query = "INSERT INTO categories (cat_id, category) " \
-                    "VALUES(NULL, ?)"
+            query = """INSERT INTO categories (cat_id, category) 
+                    VALUES(NULL, ?)"""
 
             cur = con.cursor()
             try:
                 cur.execute(query, (category,))  # executes the query into db
             except sqlite3.Error:
-                return redirect('/error=Unknown+error')  # in case of an expected error
+                flash('Unknown error')
+                return redirect(request.referrer)  # in case of an expected error
 
             con.commit()
             con.close()
 
     return render_template('home.html', categories=get_categories(), logged_in=is_logged_in())
+
+
+@app.route('/search', methods=["GET", "POST"])
+# search results
+def render_search():
+    # searching database for query
+    if request.method == "POST":
+        # get data from form
+        search_query = request.form['search_query'].strip()
+
+        # search validation
+        if len(search_query) > 20:
+            flash('Search query cannot be longer than 20 characters')
+            return redirect(request.referrer)
+        else:
+            return redirect('/searchresults/{}'.format(search_query))
+
+    return render_template('search.html', categories=get_categories(), logged_in=is_logged_in())
+
+
+@app.route('/searchresults/<search_query>')
+# search results
+def render_searchresults(search_query):
+    con = create_connection(DB_NAME)  # connect to db
+
+    # have to use format to put placeholders in wildcards
+    query = """SELECT word_id, maori, english FROM words 
+            WHERE maori LIKE '%{0}%' 
+            OR english LIKE '%{0}%' 
+            OR definition LIKE '%{0}%'""".format(search_query)
+
+    cur = con.cursor()
+    try:
+        cur.execute(query)  # executes the query into db
+    except sqlite3.Error:
+        flash('Unknown Error')
+        return redirect(request.referrer)  # in case of an expected error
+
+    search_results = cur.fetchall()
+    con.commit()
+    con.close()
+
+    return render_template('searchresults.html', categories=get_categories(),
+                           logged_in=is_logged_in(), search_results=search_results, search_query=search_query)
 
 
 @app.route('/category/<cat_id>', methods=["GET", "POST"])
@@ -77,41 +124,46 @@ def render_category(cat_id):
 
         # data validation
         if len(maori) > 20:
-            return redirect("?error=Maori+word+cannot+be+longer+than+20+characters.")
+            flash('Maori word cannot be longer than 20 characters')
+            return redirect(request.referrer)
         elif len(english) > 20:
-            return redirect("?error=English+word+cannot+be+longer+than+20+characters.")
+            flash('English word cannot be longer than 20 characters')
+            return redirect(request.referrer)
         elif len(definition) < 5:
-            return redirect("?error=Definition+cannot+be+less+than+5+characters.")
+            flash('Definition cannot be less than 5 characters')
+            return redirect(request.referrer)
         elif len(date_added) > 10:
-            return redirect("?error=Date+cannot+be+longer+than+10+characters.")
+            flash('Date cannot be longer than 10 characters')
+            return redirect(request.referrer)
         else:
             # if data is good then connect to db and upload it
             con = create_connection(DB_NAME)
 
-            query = "INSERT INTO words " \
-                    "(word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added) " \
-                    "VALUES(NULL, ?, ?, ?, ?, ?, ?, 'noimage.png', ?)"
+            query = """INSERT INTO words
+                    (word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added)
+                    VALUES(NULL, ?, ?, ?, ?, ?, ?, 'noimage.png', ?)"""
 
             cur = con.cursor()
             try:  # try to execute query
                 cur.execute(query, (maori, english, cat_id, definition, word_level, session['user_id'], date_added))
             except sqlite3.Error:  # catch unexpected errors
-                return redirect('?error=Unknown+error')
+                flash('Unknown Error')
+                return redirect(request.referrer)
 
             con.commit()
             con.close()
 
     con = create_connection(DB_NAME)
     # connect to the database to select words in specific category
-    query = "SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added" \
-            " FROM words WHERE cat_id=? ORDER BY maori ASC"
+    query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
+            FROM words WHERE cat_id=? ORDER BY maori ASC"""
     cur = con.cursor()
     cur.execute(query, (cat_id,))  # execute query
     word_list = cur.fetchall()  # puts results into list
 
     # connect to the database to select only the selected category
-    query = "SELECT cat_id, category " \
-            "FROM categories WHERE cat_id=?"
+    query = """SELECT cat_id, category 
+            FROM categories WHERE cat_id=?"""
     cur = con.cursor()
     cur.execute(query, (cat_id,))  # execute query
     cat_name_list = cur.fetchall()  # puts results into list
@@ -125,33 +177,24 @@ def render_category(cat_id):
 @app.route('/word/<word_id>', methods=["GET", "POST"])
 # specific word
 def render_word(word_id):
-    # delete current word
-    if request.method == "POST" and is_logged_in():
-        email = request.form['email']  # gets input from form
-
-        if email != session['email']:  # data validation
-            return redirect("?error=Email+is+incorrect.")
-        else:  # if email is correct then delete word
-            return redirect('/confirmdeleteword/{}'.format(word_id))
-
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
-    query = "SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added" \
-            " FROM words WHERE word_id=? ORDER BY maori ASC"
+    query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
+            FROM words WHERE word_id=? ORDER BY maori ASC"""
     cur = con.cursor()
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
 
     # connect to the database to select category name of selected word
-    query = "SELECT cat_id, category " \
-            "FROM categories WHERE cat_id=?"
+    query = """SELECT cat_id, category 
+            FROM categories WHERE cat_id=?"""
     cur = con.cursor()
     cur.execute(query, (word_list[0][3],))  # execute query
     cat_name_list = cur.fetchall()  # put results in list
 
     # connect to the database to select the users details that added selected work
-    query = "SELECT user_id, fname, lname " \
-            "FROM users WHERE user_id=?"
+    query = """SELECT user_id, fname, lname 
+            FROM users WHERE user_id=?"""
     cur = con.cursor()
     cur.execute(query, (word_list[0][6],))  # execute query
     user_name_list = cur.fetchall()  # put results in list
@@ -175,23 +218,25 @@ def render_confirmdeleteword_page(word_id):
         try:
             cur.execute(query, (word_id,))  # executes the query
         except sqlite3.Error:
-            return redirect('/error=Unknown+error')  # in case of an expected error
+            flash('Unknown error')
+            return redirect(request.referrer)  # in case of an expected error
 
         con.commit()
         con.close()
-        return redirect('/?message=Word+successfully+deleted')  # return home
+        flash('Word Successfully deleted')
+        return redirect('/')  # return home
 
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
-    query = "SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added" \
-            " FROM words WHERE word_id=? ORDER BY maori ASC"
+    query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added
+            FROM words WHERE word_id=? ORDER BY maori ASC"""
     cur = con.cursor()
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
 
     # connect to the database to select the users details that added selected work
-    query = "SELECT user_id, fname, lname " \
-            "FROM users WHERE user_id=?"
+    query = """SELECT user_id, fname, lname
+            FROM users WHERE user_id=?"""
     cur = con.cursor()
     cur.execute(query, (word_list[0][6],))  # execute query
     user_name_list = cur.fetchall()  # put results in list
@@ -202,11 +247,76 @@ def render_confirmdeleteword_page(word_id):
                            logged_in=is_logged_in(), user_name_list=user_name_list)
 
 
+@app.route('/editword/<word_id>', methods=["GET", "POST"])
+# delete word
+def render_editword_page(word_id):
+    if request.method == "POST" and is_logged_in():
+        # get data from form
+        maori = request.form['maori'].strip().lower()
+        english = request.form['english'].strip().lower()
+        cat_id = request.form['cat_id'].strip()
+        definition = request.form['definition'].strip()
+        word_level = request.form['word_level']
+        image = request.form['image']
+
+        # data validation
+        if len(maori) > 20:
+            flash('Maori word cannot be longer than 20 characters')
+            return redirect(request.referrer)
+        elif len(english) > 20:
+            flash('English word cannot be longer than 20 characters')
+            return redirect(request.referrer)
+        elif len(definition) < 5:
+            flash('Definition cannot be less than 5 characters')
+            return redirect(request.referrer)
+        elif len(definition) > 100:
+            flash('Definition cannot be more than 100 characters')
+            return redirect(request.referrer)
+        else:
+            con = create_connection(DB_NAME)
+
+            # query = "INSERT INTO words " \
+            #         "(maori, english, cat_id, definition, word_level, image) " \
+            #         "VALUES(?, ?, ?, ?, ?, ?)"
+
+            query = """UPDATE words 
+                    SET maori = ?, english = ?, cat_id = ?, 
+                    definition = ?, word_level = ?, image = ? 
+                    WHERE word_id=?"""
+
+            cur = con.cursor()
+
+            try:  # try to execute query
+                cur.execute(query, (maori, english, cat_id, definition, word_level, image, word_id))
+            except sqlite3.Error:  # catch unexpected errors
+                flash('Unknown error')
+                return redirect(request.referrer)
+
+            con.commit()
+            con.close()
+            flash('Successfully edited word')
+            return redirect('/word/{}'.format(word_id))
+
+    # connect to the database to select information on selected word
+    con = create_connection(DB_NAME)
+    query = "SELECT word_id, maori, english, cat_id, definition, word_level, image" \
+            " FROM words WHERE word_id=? ORDER BY maori ASC"
+    cur = con.cursor()
+    cur.execute(query, (word_id,))  # execute query
+    word_list = cur.fetchall()  # put results in list
+
+    con.close()
+
+    return render_template('editword.html', words=word_list, categories=get_categories(),
+                           logged_in=is_logged_in())
+
+
 @app.route('/login', methods=["GET", "POST"])
 # login
 def render_login_page():
     if is_logged_in():
-        return redirect('/?message=You+are+already+logged+in')  # if already logged in re-direct to home
+        flash('You are already logged in')
+        return redirect(request.referrer)  # if already logged in re-direct to home
     print(request.form)
 
     # logging in
@@ -229,12 +339,14 @@ def render_login_page():
             lname = user_data[0][2]
             db_password = user_data[0][3]
         except IndexError:  # email or password doesn't match up to db then pass through
-            return redirect("/login?error=Email+invalid+or+password+incorrect")
+            flash('Email or password incorrect')
+            return redirect(request.referrer)
 
         # checking if the password is incorrect for that email address
 
         if not bcrypt.check_password_hash(db_password, password):
-            return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
+            flash('Email or password incorrect')
+            return redirect(request.referrer)
 
         # if all correct then add details to session
         session['email'] = email
@@ -243,6 +355,7 @@ def render_login_page():
         session['lname'] = lname
         print('is logged in')
         print(session)
+        flash('Successfully Logged In')
         return redirect('/')
 
     return render_template('login.html', logged_in=is_logged_in(), categories=get_categories())
@@ -252,7 +365,8 @@ def render_login_page():
 # sign up
 def render_signup_page():
     if is_logged_in():  # if already logged in then go home
-        return redirect('/You+are+already+logged+in')
+        flash('You are already logged in')
+        return redirect('/')
 
     if request.method == 'POST':
         print(request.form)
@@ -264,10 +378,12 @@ def render_signup_page():
         password2 = request.form.get('password2')
 
         if password != password2:  # password confirmation
-            return redirect('/signup?error=Passwords+dont+match')
+            flash('Passwords dont match')
+            return redirect(request.referrer)
 
         if len(password) < 8:  # data validation
-            return redirect('/signup?error=Password+must+be+8+characters+or+more')
+            flash('Password must be 8 characters or more')
+            return redirect(request.referrer)
 
         hashed_password = bcrypt.generate_password_hash(password)  # hash the password (encrypt
 
@@ -281,11 +397,13 @@ def render_signup_page():
         try:
             cur.execute(query, (fname, lname, email, hashed_password))  # execute query
         except sqlite3.IntegrityError:  # in case of unexpected error
-            return redirect('/signup?error=Email+is+already+used')
+            flash('Email is already used')
+            return redirect(request.referrer)
 
         con.commit()
         con.close()
-        return redirect('/login?message=Successfully+created+an+account.+Please+sign+in+to+continue')
+        flash('Successfully created an account. Please sign in to continue')
+        return redirect('/')
 
     return render_template('signup.html', logged_in=is_logged_in(), categories=get_categories())
 
@@ -297,7 +415,8 @@ def logout():
     print(list(session.keys()))
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
-    return redirect('/?message=See+you+next+time!')
+    flash('See you next time')
+    return redirect('/')
 
 
 def is_logged_in():

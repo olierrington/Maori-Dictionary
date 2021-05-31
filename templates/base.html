@@ -8,13 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=KoHo:wght@400;700&display=swap" rel="stylesheet">
 	<title>{% block title %}{% endblock %}</title>
 	<meta name="Description" content="Author: O Errington, Content: A dictionary to convert Maori words to English.">
+    <script src="https://kit.fontawesome.com/b128f5d098.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
 	<div id="container">
 
 		<header>
-			<h1>Māori Dictionary</h1>
+			<a href="/"><h1>Māori Dictionary</h1></a>
 		</header>
 
 		<nav>
@@ -25,12 +26,15 @@
 			<ul>
                 <li>
                     <a href="/">
-                        <b>Home</b><br>
+                        <i class="fas fa-home"></i><b> Home</b><br>
+                    </a>
+                    <a href="/search">
+                        <i class="fas fa-search"></i><b> Search</b><br>
                     </a>
                     {% if logged_in %}
-                        <a href="/logout"><b>Log Out</b><br></a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i><b> Log Out</b><br></a>
                     {%  else %}
-                        <a href="/login"><b>Login</b><br></a>
+                        <a href="/login"><i class="fas fa-sign-in-alt"></i><b> Login</b><br></a>
                     {%  endif %}
                     {% for category in categories %}
                         <a href="/category/{{ category[0] }}">
@@ -38,18 +42,23 @@
                         </a>
                     {% endfor %}
                     <br><br>
+
                 </li>
 			</ul>
 		</nav>
 
 		<main>
 
-            {% if request.args.get('error') %}
-                <p class="error">{{ request.args.get('error') }}</p>
-            {% endif %}
-            {% if request.args.get('message') %}
-                <p class="message">{{ request.args.get('message') }}</p>
-            {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <p class=flash>
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </p>
+                {% endif %}
+            {% endwith %}
+
             {% block main%}{% endblock %}
         </main>
 
@@ -61,5 +70,12 @@
 		</footer>
 
 	</div>
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+
 </body>
 </html>

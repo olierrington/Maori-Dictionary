@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
 
-{% block title %}Maōri Dictionary | {{ cat_name_list[0][1] }}{% endblock %}
+{% block title %}Māori Dictionary | {{ cat_name_list[0][1] }}{% endblock %}
 
 {% block main %}
     <h2>{{ cat_name_list[0][1] }}</h2>
-    <table>
-        <tr>
-            <th>Maori</th>
-            <th>English</th>
-        </tr>
-        {%  for word in words %}
-
-
-            <tr id="category-highlight">
-                <td><a href="/word/{{ word[0] }}"><p>{{ word[1] }}</p></a></td>
-                <td><a href="/word/{{ word[0] }}"><p>{{ word[2] }}</p></a></td>
+    {% if words|length == 0 %}
+        <p class="error">No words in {{ cat_name_list[0][1] }} category</p>
+    {% else %}
+        <table>
+            <tr>
+                <th>Maori</th>
+                <th>English</th>
             </tr>
+            {%  for word in words %}
 
 
-        {%  endfor %}
-    </table>
+                <tr id="category-highlight">
+                    <td><a href="/word/{{ word[0] }}"><p>{{ word[1] }}</p></a></td>
+                    <td><a href="/word/{{ word[0] }}"><p>{{ word[2] }}</p></a></td>
+                </tr>
+
+
+            {%  endfor %}
+        </table>
+    {% endif %}
 
     {% if logged_in %}
         <form class="dataform" method="post">

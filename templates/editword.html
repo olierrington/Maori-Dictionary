@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Maōri Dictionary | DELETE {{ words[0][1] }}{% endblock %}
+
+{% block main %}
+
+    {% if logged_in %}
+        <h2>Edit {{ words[0][1] }} ({{ words[0][2] }})</h2>
+
+
+        <form class="dataform" method="post">
+
+            <div>
+                <div><label for="maori">Maori Word:</label></div>
+                <div><input type="text" name="maori" id="maori" required value="{{ words[0][1] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="english">English Word:</label></div>
+                <div><input type="text" name="english" id="english" required value="{{ words[0][2] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="cat_id">Category Id Number:</label></div>
+                <div><input type="number" min="1" name="cat_id" id="cat_id" required value="{{ words[0][3] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="definition">Definition:</label></div>
+                <div><input type="text" name="definition" id="definition" required value="{{ words[0][4] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="word_level">Word Level:</label></div>
+                <div><input type="number" max="10" min="1" name="word_level" id="word_level" required value="{{ words[0][5] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="image">Image:</label></div>
+                <div><input type="text" name="image" id="image" required value="{{ words[0][6] }}"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="submit" value="CONFIRM EDIT"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="button" value="CANCEL" onclick="window.location.href='/word/{{ words[0][0] }}'"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div>
+                    <input type="button" value="PERMANENTLY DELETE" onclick="window.location.href='/confirmdeleteword/{{ words[0][0] }}'">
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+
+{% endblock %}
