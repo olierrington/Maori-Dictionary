@@ -62,6 +62,14 @@
                 <div></div>
                 <div><input type="submit"></div>
             </div>
+
+            <div>
+                <div></div>
+                <div>
+                    <input type="button" value="EDIT {{ cat_name_list[0][1] }} CATEGORY"
+                            onclick="window.location.href='/editcategory/{{ cat_name_list[0][0] }}'">
+                </div>
+            </div>
         </form>
     {% endif %}
 

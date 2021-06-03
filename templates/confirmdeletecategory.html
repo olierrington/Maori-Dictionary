@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | EDIT {{ cat_name_list[0][1] }}{% endblock %}
+
+{% block main %}
+
+    {% if logged_in %}
+        <h2>Confirm Delete {{ cat_name_list[0][1] }}</h2>
+
+
+        <form class="dataform" method="post">
+            <h3>Delete Category: {{ cat_name_list[0][1] }}</h3>
+            <p style="color: white">WARNING: This action cannot be undone</p>
+            <p style="color: white">NOTE: Words inside this category will still be searchable<br><br></p>
+
+            <div>
+                <div></div>
+                <div><input type="submit" value="CONFIRM DELETE"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="button" value="CANCEL" onclick="window.location.href='/editcategory/{{ cat_name_list[0][0] }}'"></div>
+            </div>
+        </form>
+    {% endif %}
+
+
+{% endblock %}

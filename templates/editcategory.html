@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Maōri Dictionary | EDIT {{ cat_name_list[0][1] }}{% endblock %}
+
+{% block main %}
+
+    {% if logged_in %}
+        <h2>Edit {{ cat_name_list[0][1] }}</h2>
+
+
+        <form class="dataform" method="post">
+
+            <div>
+                <div><label for="category">Category Name:</label></div>
+                <div><input type="text" name="category" id="category" required value="{{ cat_name_list[0][1] }}"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="submit" value="CONFIRM EDIT"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input type="button" value="CANCEL" onclick="window.location.href='/category/{{ cat_name_list[0][0] }}'"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div>
+                    <input type="button" value="PERMANENTLY DELETE" onclick="window.location.href='/confirmdeletecategory/{{ cat_name_list[0][0] }}'">
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+
+{% endblock %}

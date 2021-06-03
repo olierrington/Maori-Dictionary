@@ -174,6 +174,89 @@ def render_category(cat_id):
                            cat_name_list=cat_name_list, logged_in=is_logged_in())
 
 
+@app.route('/editcategory/<cat_id>', methods=["GET", "POST"])
+# delete word
+def render_editcategory_page(cat_id):
+    if request.method == "POST" and is_logged_in():
+        # get data from form
+        category = request.form['category'].strip().title()
+
+        # data validation
+        if len(category) > 20:
+            flash('Category name cannot be longer than 20 characters')
+            return redirect(request.referrer)
+        else:
+            con = create_connection(DB_NAME)
+
+            query = """UPDATE categories 
+                    SET category = ? 
+                    WHERE cat_id = ?"""
+
+            cur = con.cursor()
+            print('hi')
+            print(category)
+
+            try:  # try to execute query
+                cur.execute(query, (category, cat_id))
+                print('1234567')
+            except sqlite3.Error:  # catch unexpected errors
+                print('1234ghjkl567')
+                flash('Unknown error')
+                return redirect(request.referrer)
+
+            con.commit()
+            con.close()
+            flash('Successfully edited category')
+            return redirect('/category/{}'.format(cat_id))
+
+    # connect to the database to select information on selected category
+    con = create_connection(DB_NAME)
+    query = "SELECT cat_id, category" \
+            " FROM categories WHERE cat_id=?"
+    cur = con.cursor()
+    cur.execute(query, (cat_id,))  # execute query
+    cat_name_list = cur.fetchall()  # put results in list
+
+    con.close()
+
+    return render_template('editcategory.html', cat_name_list=cat_name_list, categories=get_categories(),
+                           logged_in=is_logged_in())
+
+
+@app.route('/confirmdeletecategory/<cat_id>', methods=["GET", "POST"])
+# delete word
+def render_confirmdeletecatgeory_page(cat_id):
+    if request.method == "POST" and is_logged_in():
+        con = create_connection(DB_NAME)  # connect to db
+
+        query = "DELETE FROM categories WHERE cat_id=?"
+
+        cur = con.cursor()
+        try:
+            cur.execute(query, (cat_id,))  # executes the query
+        except sqlite3.Error:
+            flash('Unknown error')
+            return redirect(request.referrer)  # in case of an expected error
+
+        con.commit()
+        con.close()
+        flash('Category Successfully deleted')
+        return redirect('/')  # return home
+
+    # connect to the database to select information on selected word
+    con = create_connection(DB_NAME)
+    query = """SELECT cat_id, category
+            FROM categories WHERE cat_id=?"""
+    cur = con.cursor()
+    cur.execute(query, (cat_id,))  # execute query
+    cat_name_list = cur.fetchall()  # put results in list
+
+    con.close()
+
+    return render_template('confirmdeletecategory.html', categories=get_categories(),
+                           logged_in=is_logged_in(), cat_name_list=cat_name_list)
+
+
 @app.route('/word/<word_id>', methods=["GET", "POST"])
 # specific word
 def render_word(word_id):
@@ -204,47 +287,6 @@ def render_word(word_id):
     return render_template('word.html', words=word_list, categories=get_categories(),
                            cat_name_list=cat_name_list, logged_in=is_logged_in(),
                            user_name_list=user_name_list)
-
-
-@app.route('/confirmdeleteword/<word_id>', methods=["GET", "POST"])
-# delete word
-def render_confirmdeleteword_page(word_id):
-    if request.method == "POST" and is_logged_in():
-        con = create_connection(DB_NAME)  # connect to db
-
-        query = "DELETE FROM words WHERE word_id=?"
-
-        cur = con.cursor()
-        try:
-            cur.execute(query, (word_id,))  # executes the query
-        except sqlite3.Error:
-            flash('Unknown error')
-            return redirect(request.referrer)  # in case of an expected error
-
-        con.commit()
-        con.close()
-        flash('Word Successfully deleted')
-        return redirect('/')  # return home
-
-    # connect to the database to select information on selected word
-    con = create_connection(DB_NAME)
-    query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added
-            FROM words WHERE word_id=? ORDER BY maori ASC"""
-    cur = con.cursor()
-    cur.execute(query, (word_id,))  # execute query
-    word_list = cur.fetchall()  # put results in list
-
-    # connect to the database to select the users details that added selected work
-    query = """SELECT user_id, fname, lname
-            FROM users WHERE user_id=?"""
-    cur = con.cursor()
-    cur.execute(query, (word_list[0][6],))  # execute query
-    user_name_list = cur.fetchall()  # put results in list
-
-    con.close()
-
-    return render_template('confirmdeleteword.html', words=word_list, categories=get_categories(),
-                           logged_in=is_logged_in(), user_name_list=user_name_list)
 
 
 @app.route('/editword/<word_id>', methods=["GET", "POST"])
@@ -309,6 +351,47 @@ def render_editword_page(word_id):
 
     return render_template('editword.html', words=word_list, categories=get_categories(),
                            logged_in=is_logged_in())
+
+
+@app.route('/confirmdeleteword/<word_id>', methods=["GET", "POST"])
+# delete word
+def render_confirmdeleteword_page(word_id):
+    if request.method == "POST" and is_logged_in():
+        con = create_connection(DB_NAME)  # connect to db
+
+        query = "DELETE FROM words WHERE word_id=?"
+
+        cur = con.cursor()
+        try:
+            cur.execute(query, (word_id,))  # executes the query
+        except sqlite3.Error:
+            flash('Unknown error')
+            return redirect(request.referrer)  # in case of an expected error
+
+        con.commit()
+        con.close()
+        flash('Word Successfully deleted')
+        return redirect('/')  # return home
+
+    # connect to the database to select information on selected word
+    con = create_connection(DB_NAME)
+    query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added
+            FROM words WHERE word_id=? ORDER BY maori ASC"""
+    cur = con.cursor()
+    cur.execute(query, (word_id,))  # execute query
+    word_list = cur.fetchall()  # put results in list
+
+    # connect to the database to select the users details that added selected work
+    query = """SELECT user_id, fname, lname
+            FROM users WHERE user_id=?"""
+    cur = con.cursor()
+    cur.execute(query, (word_list[0][6],))  # execute query
+    user_name_list = cur.fetchall()  # put results in list
+
+    con.close()
+
+    return render_template('confirmdeleteword.html', words=word_list, categories=get_categories(),
+                           logged_in=is_logged_in(), user_name_list=user_name_list)
 
 
 @app.route('/login', methods=["GET", "POST"])
