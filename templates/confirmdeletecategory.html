@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Māori Dictionary | EDIT {{ cat_name_list[0][1] }}{% endblock %}
+{% block title %}Māori Dictionary | DELETE {{ cat_name_list[0][1] }}{% endblock %}
 
 {% block main %}
 
@@ -15,12 +15,14 @@
 
             <div>
                 <div></div>
-                <div><input type="submit" value="CONFIRM DELETE"></div>
+                <div><input class="button" type="submit" value="CONFIRM DELETE"></div>
             </div>
 
             <div>
                 <div></div>
-                <div><input type="button" value="CANCEL" onclick="window.location.href='/editcategory/{{ cat_name_list[0][0] }}'"></div>
+                <div><input class="button" type="button" value="CANCEL"
+                            onclick="window.location.href='/editcategory/{{ cat_name_list[0][0] }}'">
+                </div>
             </div>
         </form>
     {% endif %}

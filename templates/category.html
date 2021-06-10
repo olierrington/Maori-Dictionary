@@ -7,6 +7,21 @@
     {% if words|length == 0 %}
         <p class="error">No words in {{ cat_name_list[0][1] }} category</p>
     {% else %}
+        <form method="post" class="filter">
+            <div>
+                <div><label for="search_filter">Filter results by:</label></div>
+
+                <select name="search_filter" id="search_filter">
+                    <option id="maori_filter" value="maori_filter">Maori Word</option>
+                    <option id="english_filter" value="english_filter">English Word</option>
+                    <option id="word_level_filter" value="word_level_filter">Word Level</option>
+                    <option id="recent_filter" value="recent_filter">Recently Added</option>
+                </select>
+
+            <button type="submit">Update Filter</button>
+            </div>
+        </form>
+
         <table>
             <tr>
                 <th>Maori</th>
@@ -26,51 +41,26 @@
     {% endif %}
 
     {% if logged_in %}
-        <form class="dataform" method="post">
-            <h3>Add A Word to the {{ cat_name_list[0][1] }} Category</h3>
-            <div>
-                <div><label for="maori">Maori Word:</label></div>
-                <div><input type="text" name="maori" id="maori" required></div>
-            </div>
+        <div class="buttons">
+            <button onclick="window.location.href='/editcategory/{{ cat_name_list[0][0] }}'">
+                Edit {{ cat_name_list[0][1] }} Category
+            </button>
 
-            <div>
-                <div><label for="english">English Translation:</label></div>
-                <div><input type="text" name="english" id="english" required></div>
-            </div>
-
-            <div>
-                <div><label for="definition">Definition:</label></div>
-                <div><input type="text" name="definition" id="definition" required></div>
-            </div>
-
-            <div>
-                <div><label for="word_level">Word Level:</label></div>
-                <div><input type="number" name="word_level" id="word_level" min="1" max="10" required></div>
-            </div>
-
-            <div>
-                <div><label for="date_added">Date:</label></div>
-                <div><input type="text" name="date_added" id="date_added" placeholder="DD/MM/YY" required></div>
-            </div>
-
-            <div>
-                <div></div>
-                <div><input type="reset"></div>
-            </div>
-
-            <div>
-                <div></div>
-                <div><input type="submit"></div>
-            </div>
-
-            <div>
-                <div></div>
-                <div>
-                    <input type="button" value="EDIT {{ cat_name_list[0][1] }} CATEGORY"
-                            onclick="window.location.href='/editcategory/{{ cat_name_list[0][0] }}'">
-                </div>
-            </div>
-        </form>
+            <button onclick="window.location.href='/addword/{{ cat_name_list[0][0] }}'">
+                Add Word to {{ cat_name_list[0][1] }} Category
+            </button>
+        </div>
     {% endif %}
+
+{% endblock %}
+
+{% block my_script%}
+<script>
+$( document ).ready(function() {
+    $("[id^={{ search_filter }}]").attr({
+        "selected" : "selected"
+    })
+});
+</script>
 
 {% endblock %}

@@ -7,34 +7,36 @@
 
     <h2>{{ words[0][1] }} ({{ words[0][2] }})</h2>
 
+    {% if cat_name_list|length == 0 %}
+        <p class="error">No information found in {{ words[0][1] }} word. Please try again later.</p>
+    {% else %}
+        <table>
 
-    <table>
+            {%  for word in words %}
 
-        {%  for word in words %}
+                <tr>
+                    <th>Category</th><td><p>{{ cat_name_list[0][1] }}</p></td>
+                </tr>
+                <tr>
+                    <th>Definition</th><td><p>{{ word[4] }}</p></td>
+                </tr>
+                <tr>
+                    <th>Word Level</th><td><p>{{ word[5] }}</p></td>
+                </tr>
+                <tr>
+                    <th>User Added</th><td><p>{{ user_name_list[0][1] }} {{ user_name_list[0][2] }}</p></td>
+                </tr>
+                <tr>
+                    <th>Image</th><td><img alt="word_image" src="/static/images/{{ word[7] }}"></td>
+                </tr>
+                <tr>
+                    <th>Date Added</th><td><p>{{ word[8] }}</p></td>
+                </tr>
 
-            <tr>
-                <th>Category</th><td><p>{{ cat_name_list[0][1] }}</p></td>
-            </tr>
-            <tr>
-                <th>Definition</th><td><p>{{ word[4] }}</p></td>
-            </tr>
-            <tr>
-                <th>Word Level</th><td><p>{{ word[5] }}</p></td>
-            </tr>
-            <tr>
-                <th>User Added</th><td><p>{{ user_name_list[0][1] }} {{ user_name_list[0][2] }}</p></td>
-            </tr>
-            <tr>
-                <th>Image</th><td><img alt="word_image" src="/static/images/{{ word[7] }}"></td>
-            </tr>
-            <tr>
-                <th>Date Added</th><td><p>{{ word[8] }}</p></td>
-            </tr>
+            {%  endfor %}
 
-        {%  endfor %}
-
-    </table>
-
+        </table>
+    {% endif %}
 
     {% if logged_in %}
         <form class="dataform" method="post">
@@ -42,7 +44,7 @@
 
             <div>
                 <div></div>
-                <div><input type="button" value="EDIT" onclick="window.location.href='/editword/{{ words[0][0] }}'"></div>
+                <div><input class="button" type="button" value="EDIT" onclick="window.location.href='/editword/{{ words[0][0] }}'"></div>
             </div>
 
         </form>

@@ -1,15 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}Māori Dictionary | Search{% endblock %}
+{% block title %}Māori Dictionary | Search Results{% endblock %}
 
 {% block main %}
 
     <h2>Search: {{ search_query }}</h2>
 
+
+    <form method="post" class="filter">
+        <div>
+            <div><label for="search_filter">Filter results by:</label></div>
+
+            <select name="search_filter" id="search_filter">
+                <option id="maori_filter" value="maori_filter">Maori Word</option>
+                <option id="english_filter" value="english_filter">English Word</option>
+                <option id="word_level_filter" value="word_level_filter">Word Level</option>
+                <option id="recent_filter" value="recent_filter">Recently Added</option>
+            </select>
+
+        <button type="submit">Update Filter</button>
+        </div>
+    </form>
+
+
     {%  if search_results|length == 0 %}
         <p class="error">No Results Found</p>
     {% else %}
         <table>
+
             <tr>
                 <th>Maori</th>
                 <th>English</th>
@@ -17,17 +35,29 @@
 
             {%  for search_result in search_results %}
 
-
                 <tr id="category-highlight">
                     <td><a href="/word/{{ search_result[0] }}"><p>{{ search_result[1] }}</p></a></td>
                     <td><a href="/word/{{ search_result[0] }}"><p>{{ search_result[2] }}</p></a></td>
                 </tr>
 
-
             {%  endfor %}
+
         </table>
     {% endif %}
-    <button onclick="goBack()">Search Again</button>
+    <div class="buttons">
+        <button onclick="goBack()">Search Again</button>
+    </div>
 
+
+{% endblock %}
+
+{% block my_script%}
+<script>
+$( document ).ready(function() {
+    $("[id^={{ search_filter }}]").attr({
+        "selected" : "selected"
+    })
+});
+</script>
 
 {% endblock %}

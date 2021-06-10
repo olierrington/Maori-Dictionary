@@ -61,6 +61,18 @@ a {
 img {
     width: 100%;
 }
+
+button, .button {
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    transition-duration: 0.2s;
+}
+
+button:hover, .button:hover {
+    box-shadow: 0 10px 10px 0 rgba(0,0,0,0.24),0 5px 5px 0 rgba(0,0,0,0.19);
+}
+
 .dataform {
     margin: 1rem 0;
     border: 0;
@@ -79,10 +91,51 @@ img {
 
 .dataform input, button {
     width: 100%;
+    border: none;
     border-radius: 5px;
     padding: 0.5rem;
     margin: 12px 0 12px 0;
     font-size: 1rem;
+}
+
+.buttons {
+    margin: 1rem 0;
+    border: 0;
+    padding: 1rem;
+    background-color: indianred;
+    border-radius: 5px;
+    color: white;
+}
+
+.filter {
+    margin: 1rem 0;
+    border: 0;
+    padding: 1rem;
+    background-color: indianred;
+    border-radius: 5px;
+    color: white;
+}
+
+.filter select {
+    margin-top: 1rem;
+    padding: 0 1rem;
+    border: none;
+    background-color: white;
+    color: black;
+    border-radius: 0.5rem;
+    width: auto;
+    cursor: pointer;
+    height: 2.5rem;
+}
+
+.filter button {
+    margin-top: 1rem;
+    padding: 0 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    width: auto;
+    height: 2.5rem;
+    margin-left: 1rem;
 }
 
 .flash {
@@ -106,8 +159,12 @@ b {
     font-weight: 700;
 }
 
+#category-highlight {
+    transition-duration: 0.2s;
+}
+
 #category-highlight:hover {
-    background-color: #cd5c5c;
+    background-color: indianred;
 }
 
 th {
