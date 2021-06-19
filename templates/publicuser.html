@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | Public User{% endblock %}
+
+{% block main %}
+    <div>
+        <i class="fas fa-user user-img"></i>
+        <span class="span-heading">User: {{ user_info[0][1] }} {{ user_info[0][2] }}</span>
+    </div>
+
+    {% if user_words_info|length == 0 %}
+        <h4>{{ user_info[0][1] }} hasn't added any words yet!</h4>
+    {% else %}
+        <h4>{{ user_info[0][1] }} has added/ edited {{ user_words_info|length }} words</h4>
+
+        <table>
+            <tr>
+                <th>Words Added/ Edited:</th>
+            </tr>
+            {% for user_word_info in user_words_info %}
+                <tr class="category-highlight">
+                    <td>
+                        <a href="/word/{{ user_word_info[0] }}">
+                            <p>
+                                Added word {{ user_word_info[1] }} ({{ user_word_info[2] }}) on {{ user_word_info[4] }}
+                            </p>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+
+{% endblock %}

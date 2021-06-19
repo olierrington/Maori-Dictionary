@@ -32,7 +32,7 @@ main {
     background-color: #edd;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, .span-heading {
     padding: 1rem 0;
     font-weight: 700;
     font-size: 2rem;
@@ -47,6 +47,10 @@ h1 {
 h3 {
     font-size: 1.5rem;
     color: white;
+}
+
+h4 {
+    font-size: 1.3rem;
 }
 
 p {
@@ -138,6 +142,11 @@ button:hover, .button:hover {
     margin-left: 1rem;
 }
 
+.user-img {
+    font-size: 2rem;
+    padding: 1rem 1rem 0 0;
+}
+
 .flash {
     color: indianred;
     font-size: 1.5rem;
@@ -159,11 +168,11 @@ b {
     font-weight: 700;
 }
 
-#category-highlight {
+.category-highlight {
     transition-duration: 0.2s;
 }
 
-#category-highlight:hover {
+.category-highlight:hover {
     background-color: indianred;
 }
 

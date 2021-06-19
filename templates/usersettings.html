@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | Account Settings{% endblock %}
+
+{% block main %}
+    <div>
+        <i class="fas fa-cog user-img"></i>
+        <span class="span-heading">Account Settings</span>
+
+        <form class="dataform" method="post">
+            <div>
+                <div><label for="fname">First Name:</label></div>
+                <div><input type="text" name="fname" id="fname" required value="{{ user_info[0][1] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="lname">Last Name:</label></div>
+                <div><input type="text" name="lname" id="lname" required value="{{ user_info[0][2] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="email">Email:</label></div>
+                <div><input type="text" name="email" id="email" required value="{{ user_info[0][3] }}"></div>
+            </div>
+
+            <div>
+                <div><label for="password">To update details, enter your password:</label></div>
+                <div><input type="password" name="password" id="password" required></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div><input class="button" type="submit" value="Confirm Changes"></div>
+            </div>
+
+            <div>
+                <div></div>
+                <div>
+                    <button onclick="window.location.href='/changepassword'">
+                        Change Password
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+{% endblock %}

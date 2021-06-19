@@ -32,6 +32,9 @@
                         <i class="fas fa-search"></i><b> Search</b><br>
                     </a>
                     {% if logged_in %}
+                        <a href="/user">
+                            <i class="fas fa-user"></i><b> Account</b><br>
+                        </a>
                         <a href="/logout"><i class="fas fa-sign-out-alt"></i><b> Log Out</b><br></a>
                     {%  else %}
                         <a href="/login"><i class="fas fa-sign-in-alt"></i><b> Login</b><br></a>

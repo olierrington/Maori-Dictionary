@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | Public User{% endblock %}
+
+{% block main %}
+    <div>
+        <i class="fas fa-user user-img"></i>
+        <span class="span-heading">Kia Ora {{ user_info[0][1] }} {{ user_info[0][2] }}</span>
+    </div>
+
+    {% if user_words_info|length == 0 %}
+        <h4>You haven't added any words yet!</h4>
+        <p>Select a category, and then press the add word button at the bottom of the page to begin adding words.</p>
+        <br>
+    {% else %}
+        <h4>You've been busy recently {{ user_info[0][1] }}!</h4>
+        <p>In total, you have added/ edited {{ user_words_info|length }} words. Ka pai.</p>
+        <br>
+
+        <table>
+            <tr>
+                <th>Words Added/ Edited</th>
+            </tr>
+            {% for user_word_info in user_words_info %}
+                <tr class="category-highlight">
+                    <td>
+                        <a href="/word/{{ user_word_info[0] }}">
+                            <p>
+                                Added word {{ user_word_info[1] }} ({{ user_word_info[2] }}) on {{ user_word_info[4] }}
+                            </p>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <div class="buttons">
+        <button onclick="window.location.href='/publicuser/{{ user_info[0][0] }}'">
+            View Account as Public User
+        </button>
+        <button onclick="window.location.href='/usersettings'">
+            Account Settings
+        </button>
+    </div>
+
+
+{% endblock %}
