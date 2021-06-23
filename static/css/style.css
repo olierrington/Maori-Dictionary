@@ -93,9 +93,54 @@ button:hover, .button:hover {
     margin: 0.8rem 0 0.8rem 0;
 }
 
-.dataform input, button {
+.dataform input, button, textarea {
     width: 100%;
+    resize: none;
     border: none;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin: 12px 0 12px 0;
+    font-size: 1rem;
+}
+
+textarea {
+    height: 10rem;
+}
+
+#word_level {
+    appearance: none;
+    width: 100%;
+    height: 2.5rem;
+    outline: none;
+    border-radius: 3rem;
+}
+
+#word_level::-webkit-slider-runnable-track {
+    background-color: #ddd;
+    border-radius: 3rem;
+    height: 50%;
+    margin: 0 0.5rem;
+}
+
+#word_level::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: indianred;
+    cursor: pointer;
+    border-radius: 50%;
+    margin-top: -0.5rem;
+}
+
+.categoryselect {
+    border: none;
+    background-color: white;
+    color: black;
+    width: 100%;
+    cursor: pointer;
+    height: 2.5rem;
+    resize: none;
     border-radius: 5px;
     padding: 0.5rem;
     margin: 12px 0 12px 0;
@@ -145,6 +190,17 @@ button:hover, .button:hover {
 .user-img {
     font-size: 2rem;
     padding: 1rem 1rem 0 0;
+}
+
+.user-img-small {
+    box-sizing: border-box;
+    padding: 1rem 0 0 0.6rem;
+    font-size: 1.2rem;
+    color: darkgray;
+}
+
+.user-img-small:hover {
+    color: black;
 }
 
 .flash {

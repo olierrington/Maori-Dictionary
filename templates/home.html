@@ -16,7 +16,7 @@
         Māori, also known as te reo ('the language'), is an Eastern Polynesian
         language spoken by the Māori people, the indigenous population of New Zealand.
         It gained recognition as one of New Zealand's official languages in 1987.
-        The number of speakers of the language has declined sharply since 1945,but a
+        The number of speakers of the language has declined sharply since 1945, but a
         Māori-language revitalisation effort slowed the decline, and the language
         has experienced a revival, particularly since about 2015.
     </p>
@@ -39,6 +39,12 @@
                 <div><input class="button" type="submit"></div>
             </div>
         </form>
+    {% else %}
+        <div class="buttons">
+        <button onclick="window.location.href='/search'">
+            Search the Maori Dictionary
+        </button>
+    </div>
     {% endif %}
 
 {% endblock %}

@@ -6,6 +6,7 @@
     <div>
         <i class="fas fa-user user-img"></i>
         <span class="span-heading">User: {{ user_info[0][1] }} {{ user_info[0][2] }}</span>
+        <a href="mailto:{{ user_info[0][3] }}"><i class="fas fa-envelope user-img-small"></i></a>
     </div>
 
     {% if user_words_info|length == 0 %}
@@ -22,7 +23,7 @@
                     <td>
                         <a href="/word/{{ user_word_info[0] }}">
                             <p>
-                                Added word {{ user_word_info[1] }} ({{ user_word_info[2] }}) on {{ user_word_info[4] }}
+                                {{ user_word_info[1] }} ({{ user_word_info[2] }}) on {{ user_word_info[4] }}
                             </p>
                         </a>
                     </td>

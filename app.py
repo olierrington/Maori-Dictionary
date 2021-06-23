@@ -322,6 +322,7 @@ def render_confirmdeletecatgeory_page(cat_id):
     if request.method == "POST" and is_logged_in():
 
         con = create_connection(DB_NAME)  # connect to db
+
         query = "DELETE FROM categories WHERE cat_id=?"
         cur = con.cursor()
 
@@ -334,8 +335,35 @@ def render_confirmdeletecatgeory_page(cat_id):
 
         con.commit()
         con.close()
-        flash('Category Successfully deleted')
-        return redirect('/')  # return home
+
+        if request.form['submit'] == 'DELETE CATEGORY':
+            print('delete category')
+            flash('Category Successfully deleted')
+            return redirect('/')  # return home
+        elif request.form['submit'] == 'DELETE CATEGORY AND WORDS WITHIN':
+            print('delete category and words')
+
+            con = create_connection(DB_NAME)
+
+            query = "DELETE FROM words WHERE cat_id=?"
+            cur = con.cursor()
+
+            try:
+                cur.execute(query, (cat_id,))  # executes the query
+
+            except sqlite3.Error:
+                flash('Unknown error')
+                return redirect(request.referrer)  # in case of an expected
+
+            con.commit()
+            con.close()
+
+            flash('Successfully deleted category and all words within')
+            return redirect('/')
+        else:
+            print('error')
+            flash('There was an error. Please try again later.')
+            return redirect('/')
 
     # connect to the database to select information on selected category
     con = create_connection(DB_NAME)
@@ -349,10 +377,20 @@ def render_confirmdeletecatgeory_page(cat_id):
         flash('Unknown Category')
         return redirect('/')
 
+    query = """SELECT word_id, cat_id
+    FROM words
+    WHERE cat_id=?"""
+    cur = con.cursor()
+    cur.execute(query, (cat_id,))
+    words_number = cur.fetchall()
+
+    print(words_number)
+
     con.close()
 
     return render_template('confirmdeletecategory.html', categories=get_categories(),
-                           logged_in=is_logged_in(), cat_name_list=cat_name_list)
+                           logged_in=is_logged_in(), cat_name_list=cat_name_list,
+                           words_number=words_number)
 
 
 @app.route('/word/<word_id>')
@@ -399,7 +437,7 @@ def render_editword_page(word_id):
         # get all data from form and clean
         maori = request.form['maori'].strip().lower()
         english = request.form['english'].strip().lower()
-        cat_id = request.form['cat_id'].strip()
+        cat = request.form['cat']
         definition = request.form['definition'].strip()
         word_level = request.form['word_level']
         image = request.form['image']
@@ -416,6 +454,14 @@ def render_editword_page(word_id):
             return redirect(request.referrer)
         else:
             con = create_connection(DB_NAME)
+
+            query = """SELECT cat_id, category
+            FROM categories
+            WHERE category=?"""
+            cur = con.cursor()
+            cur.execute(query, (cat,))
+            cat_id = cur.fetchall()[0][0]
+
             query = """UPDATE words 
                     SET maori = ?, english = ?, cat_id = ?, definition = ?, 
                     word_level = ?, user_id=?, image = ?, date_added = strftime('%d-%m-%Y','now') 
@@ -446,10 +492,17 @@ def render_editword_page(word_id):
         flash('Unknown Word')
         return redirect('/')
 
+    query = """SELECT cat_id, category
+    FROM categories 
+    ORDER BY category ASC"""
+    cur = con.cursor()
+    cur.execute(query)  # execute query
+    cat_list = cur.fetchall()  # put results in list
+
     con.close()
 
     return render_template('editword.html', words=word_list, categories=get_categories(),
-                           logged_in=is_logged_in())
+                           logged_in=is_logged_in(), cat_list=cat_list)
 
 
 @app.route('/confirmdeleteword/<word_id>', methods=["GET", "POST"])
@@ -549,6 +602,80 @@ def render_login_page():
         return redirect('/')
 
     return render_template('login.html', logged_in=is_logged_in(), categories=get_categories())
+
+
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+# sign up
+def render_forgotpassword_page():
+    if is_logged_in():  # if already logged in then go home
+        flash('You are already logged in')
+        return redirect('/')
+
+    # sign up form
+    if request.method == 'POST':
+        print(request.form)
+        # get info from form and clean it
+        fname = request.form.get('fname').strip().title()
+        lname = request.form.get('lname').strip().title()
+        email = request.form.get('email').strip().lower()
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+
+        query = """SELECT user_id, fname, lname, email, password FROM users WHERE email = ?"""
+        con = create_connection(DB_NAME)
+        cur = con.cursor()
+        try:
+            cur.execute(query, (email,))  # execute query
+            user_data = cur.fetchall()  # put into list
+        except ValueError:
+            flash('email is incorrect')
+            return redirect(request.referrer)
+        con.close()
+
+        if len(user_data) == 0:
+            flash('Email is incorrect')
+            return redirect(request.referrer)
+
+        elif password != password2:  # password confirmation
+            flash('Passwords dont match')
+            return redirect(request.referrer)
+
+        # data validation
+        elif len(password) < 8 or len(password) > 30:
+            flash('Password must be between 8 and 30 characters')
+            return redirect(request.referrer)
+
+        elif fname != user_data[0][1]:
+            flash('First name is incorrect')
+            return redirect(request.referrer)
+
+        elif lname != user_data[0][2]:
+            flash('Last name is incorrect')
+            return redirect(request.referrer)
+
+        else:
+            hashed_password = bcrypt.generate_password_hash(password)  # hash the password
+
+            con = create_connection(DB_NAME)
+            # add user to database
+            query = """UPDATE users 
+                    SET password=?
+                    WHERE email=?"""
+            cur = con.cursor()
+
+            try:
+                cur.execute(query, (hashed_password, email,))  # execute query
+
+            except sqlite3.IntegrityError:  # in case of unexpected error
+                flash('Unknown Error')
+                return redirect(request.referrer)
+
+            con.commit()
+            con.close()
+            flash('Successfully changed password. Please sign in to continue')
+            return redirect('/login')
+
+    return render_template('forgotpassword.html', logged_in=is_logged_in(), categories=get_categories())
 
 
 @app.route('/signup', methods=['GET', 'POST'])

@@ -21,18 +21,29 @@
             </div>
 
             <div>
-                <div><label for="cat_id">Category Id Number:</label></div>
-                <div><input type="number" min="1" name="cat_id" id="cat_id" required value="{{ words[0][3] }}"></div>
+                <div><label for="cat">Category:</label></div>
+                <div>
+                    <select name="cat" id="cat" class="categoryselect">
+                        {% for cat in cat_list %}
+                            <option id="{{ cat[1] }}" value="{{ cat[1] }}">{{ cat[1] }}</option>
+                        {% endfor %}
+                </select>
+                </div>
             </div>
 
             <div>
                 <div><label for="definition">Definition:</label></div>
-                <div><input type="text" name="definition" id="definition" required value="{{ words[0][4] }}"></div>
+                <div><textarea name="definition" id="definition" required>{{ words[0][4] }}</textarea></div>
             </div>
 
             <div>
-                <div><label for="word_level">Word Level:</label></div>
-                <div><input type="number" max="10" min="1" name="word_level" id="word_level" required value="{{ words[0][5] }}"></div>
+                <div><label for="word_level">Word Level: <span id="rangeValue">{{ words[0][5] }}</span></label></div>
+                <div>
+                    <input type="range" min="1" max="10" value="{{ words[0][5] }}"
+                            name="word_level" id="word_level" required
+                            onChange="rangeSlide(this.value)"
+                            onmousemove="rangeSlide(this.value)">
+                </div>
             </div>
 
             <div>
@@ -59,5 +70,11 @@
         </form>
     {% endif %}
 
+
+    <script type="text/javascript">
+        function rangeSlide(value) {
+            document.getElementById('rangeValue').innerHTML = value;
+        }
+    </script>
 
 {% endblock %}
