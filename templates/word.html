@@ -24,13 +24,21 @@
                 </tr>
                 <tr>
                     <th>Word Level</th>
-                    <td><p>{{ word[5] }}</p></td>
+                    <td class="category-highlight">
+                        <a href="/searchresults/{{ word[5] }}">
+                            <p>{{ word[5] }} &nbsp;
+                                <i class="fas fa-external-link-alt external-link"></i>
+                            </p>
+                        </a>
+                    </td>
                 </tr>
                 <tr>
                     <th>User Edited</th>
                     <td class="category-highlight">
                         <a href="/publicuser/{{ user_name_list[0][0] }}">
-                            <p><u>{{ user_name_list[0][1] }} {{ user_name_list[0][2] }}</u></p>
+                            <p>{{ user_name_list[0][1] }} {{ user_name_list[0][2] }} &nbsp;
+                                <i class="fas fa-external-link-alt external-link"></i>
+                            </p>
                         </a>
                     </td>
                 </tr>

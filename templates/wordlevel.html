@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Māori Dictionary | Word Level{% endblock %}
+
+{% block main %}
+    <h2>Word Level: {{ word_level }}</h2>
+
+    <form method="post" class="filter">
+        <div>
+            <div><label for="search_filter">Filter results by:</label></div>
+
+            <select name="search_filter" id="search_filter">
+                <option id="maori_filter" value="maori_filter">Maori Word</option>
+                <option id="english_filter" value="english_filter">English Word</option>
+                <option id="recent_filter" value="recent_filter">Recently Added</option>
+            </select>
+
+        <button type="submit">Update Filter</button>
+        </div>
+    </form>
+
+    <table>
+        <tr>
+            <th>Maori</th>
+            <th>English</th>
+        </tr>
+        {%  for word in words %}
+
+
+            <tr class="category-highlight">
+                <td><a href="/word/{{ word[0] }}"><p>{{ word[1] }}</p></a></td>
+                <td><a href="/word/{{ word[0] }}"><p>{{ word[2] }}</p></a></td>
+            </tr>
+
+
+        {%  endfor %}
+    </table>
+
+{% endblock %}
+
+{% block my_script%}
+<script>
+    $( document ).ready(function() {
+        $("[id^={{ search_filter }}]").attr({
+            "selected" : "selected"
+        })
+    });
+</script>
+
+{% endblock %}

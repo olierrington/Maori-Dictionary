@@ -56,11 +56,11 @@
 
 {% block my_script%}
 <script>
-$( document ).ready(function() {
-    $("[id^={{ search_filter }}]").attr({
-        "selected" : "selected"
-    })
-});
+    $( document ).ready(function() {
+        $("[id^={{ search_filter }}]").attr({
+            "selected" : "selected"
+        })
+    });
 </script>
 
 {% endblock %}

@@ -7,25 +7,27 @@
     <h2>Search: {{ search_query }}</h2>
 
 
-    <form method="post" class="filter">
-        <div>
-            <div><label for="search_filter">Filter results by:</label></div>
-
-            <select name="search_filter" id="search_filter">
-                <option id="maori_filter" value="maori_filter">Maori Word</option>
-                <option id="english_filter" value="english_filter">English Word</option>
-                <option id="word_level_filter" value="word_level_filter">Word Level</option>
-                <option id="recent_filter" value="recent_filter">Recently Added</option>
-            </select>
-
-        <button type="submit">Update Filter</button>
-        </div>
-    </form>
 
 
     {%  if search_results|length == 0 %}
         <p class="error">No Results Found</p>
     {% else %}
+        <form method="post" class="filter">
+            <div>
+                <div><label for="search_filter">Filter results by:</label></div>
+
+                <select name="search_filter" id="search_filter">
+                    <option id="maori_filter" value="maori_filter">Maori Word</option>
+                    <option id="english_filter" value="english_filter">English Word</option>
+                    <option id="word_level_filter" value="word_level_filter">Word Level</option>
+                    <option id="recent_filter" value="recent_filter">Recently Added</option>
+                </select>
+
+            <button type="submit">Update Filter</button>
+            </div>
+        </form>
+
+
         <table>
 
             <tr>

@@ -22,7 +22,7 @@
 
             <div>
                 <div><label for="cat">Category:</label></div>
-                <div>
+                <div class="categoryselectpseudo">
                     <select name="cat" id="cat" class="categoryselect">
                         {% for cat in cat_list %}
                             <option id="{{ cat[1] }}" value="{{ cat[1] }}">{{ cat[1] }}</option>

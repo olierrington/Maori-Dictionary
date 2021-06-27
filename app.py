@@ -4,7 +4,6 @@ from sqlite3 import Error
 from flask_bcrypt import Bcrypt
 # imports everything needed
 
-
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "aj777qwerty5@#$%^&*(OMG5ugly%^$##"
@@ -717,9 +716,19 @@ def render_signup_page():
             return redirect(request.referrer)
 
         else:
+            con = create_connection(DB_NAME)
+            query = """SELECT user_id, email
+                        FROM users WHERE email=?"""
+            cur = con.cursor()
+            cur.execute(query, (email,))  # execute query
+            email_check = cur.fetchall()  # put results in list
+
+            if len(email_check) != 0:
+                flash('Email already being used')
+                return redirect(request.referrer)
+
             hashed_password = bcrypt.generate_password_hash(password)  # hash the password
 
-            con = create_connection(DB_NAME)
             # add user to database
             query = "INSERT INTO users (user_id, fname, lname, email, password) " \
                     "VALUES(NULL,?,?,?,?)"
@@ -875,6 +884,17 @@ def render_usersettings_page():
 
         else:  # if good then update
             con = create_connection(DB_NAME)
+
+            query = """SELECT user_id, email
+            FROM users WHERE email=?"""
+            cur = con.cursor()
+            cur.execute(query, (email,))
+            email_check = cur.fetchall()
+
+            if len(email_check) != 0 and email != session['email']:
+                flash('Email already used')
+                return redirect(request.referrer)
+
             query = """UPDATE users 
             SET fname = ?, lname = ?, email = ? 
             WHERE user_id=?"""
