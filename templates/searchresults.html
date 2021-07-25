@@ -4,8 +4,12 @@
 
 {% block main %}
 
-    <h2>Search: {{ search_query }}</h2>
-
+    <h2>Search:</h2>
+    <div class="buttons fake_search">
+        <a href="/search?search={{ search_query }}">
+                <div>{{ search_query }}</div>
+        </a>
+    </div>
 
 
 
@@ -46,9 +50,9 @@
 
         </table>
     {% endif %}
-    <div class="buttons">
-        <button onclick="goBack()">Search Again</button>
-    </div>
+{#    <div class="buttons">#}
+{#        <button onclick="goBack()">Search Again</button>#}
+{#    </div>#}
 
 
 {% endblock %}

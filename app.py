@@ -27,7 +27,7 @@ def get_categories():
     con = create_connection(DB_NAME)
     query = """SELECT cat_id, category 
             FROM categories 
-            ORDER BY category ASC"""
+            ORDER BY category"""
     cur = con.cursor()
     cur.execute(query)
     category_list = cur.fetchall()
@@ -70,6 +70,11 @@ def render_homepage():
 @app.route('/search', methods=["GET", "POST"])
 # search
 def render_search():
+    default_search = request.args.get('search')
+
+    if default_search == 'Searching All Words...':
+        default_search = None
+
     # from form on search page
     # searching database for query
     if request.method == "POST":
@@ -82,65 +87,56 @@ def render_search():
             return redirect(request.referrer)
 
         elif len(search_query) == 0:
-            flash('Please enter a search query')
-            return redirect(request.referrer)
+            return redirect('/searchresults/Searching%20All%20Words...')
 
         elif ' ' in search_query:
-            flash('Search query can not contain a space')
+            flash('Search query can not contain a space!')
             return redirect(request.referrer)
 
         else:  # if search query clean then search it
             return redirect('/searchresults/{}'.format(search_query))
 
-    return render_template('search.html', categories=get_categories(), logged_in=is_logged_in())
+    return render_template('search.html', categories=get_categories(),
+                           logged_in=is_logged_in(), default_search=default_search)
 
 
+@app.route('/searchresults/', defaults={'search_query': 'Searching All Words...'}, methods=["GET", "POST"])
 @app.route('/searchresults/<search_query>', methods=["GET", "POST"])
 # search results
 def render_searchresults(search_query):
+
     search_filter = 'maori_filter'  # set default filter as maori filter
 
     if request.method == "POST":
         # get data from filter form
         search_filter = request.form['search_filter']
 
+    if search_filter == 'english_filter':
+        filter_order = 'english, maori'
+    elif search_filter == 'word_level_filter':
+        filter_order = 'word_level, maori'
+    elif search_filter == 'recent_filter':
+        filter_order = 'word_id DESC'
+    elif search_filter == 'maori_filter':
+        filter_order = 'maori, english'
+    else:
+        filter_order = 'maori, english'
+
     con = create_connection(DB_NAME)  # connect to db
     # have to use .format() to put placeholders in wildcards
 
-    if search_filter == 'english_filter':
-        query = """SELECT word_id, maori, english, word_level FROM words 
-            WHERE maori LIKE '%{0}%' 
-            OR english LIKE '%{0}%' 
-            OR definition LIKE '%{0}%'
-            OR word_level LIKE '%{0}%'
-            ORDER BY english, maori ASC""".format(search_query)
-    elif search_filter == 'word_level_filter':
-        query = """SELECT word_id, maori, english, word_level FROM words 
-            WHERE maori LIKE '%{0}%' 
-            OR english LIKE '%{0}%' 
-            OR definition LIKE '%{0}%'
-            OR word_level LIKE '%{0}%'
-            ORDER BY word_level, maori ASC""".format(search_query)
-    elif search_filter == 'recent_filter':
-        query = """SELECT word_id, maori, english, word_level FROM words 
-            WHERE maori LIKE '%{0}%' 
-            OR english LIKE '%{0}%' 
-            OR definition LIKE '%{0}%'
-            OR word_level LIKE '%{0}%'
-            ORDER BY word_id DESC""".format(search_query)
-    elif search_filter == 'maori_filter':
-        query = """SELECT word_id, maori, english, word_level FROM words 
-            WHERE maori LIKE '%{0}%' 
-            OR english LIKE '%{0}%' 
-            OR definition LIKE '%{0}%'
-            OR word_level LIKE '%{0}%'
-            ORDER BY maori, english ASC""".format(search_query)
-    else:
-        query = """SELECT word_id, maori, english, word_level FROM words
-        ORDER BY maori, english ASC"""
-    cur = con.cursor()
+    query = """SELECT word_id, maori, english, word_level FROM words 
+                WHERE maori LIKE '%{0}%' 
+                OR english LIKE '%{0}%' 
+                OR definition LIKE '%{0}%'
+                OR word_level LIKE '%{0}%'
+                ORDER BY {1}""".format(search_query, filter_order)
 
-    print('hi')
+    if search_query == 'Searching All Words...':
+        query = """SELECT word_id, maori, english, word_level FROM words
+                ORDER BY {}""".format(filter_order)
+
+    cur = con.cursor()
 
     try:
         cur.execute(query)  # executes the query into db
@@ -172,16 +168,16 @@ def render_category(cat_id):
 
     if search_filter == 'english_filter':
         query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
-                    FROM words WHERE cat_id=? ORDER BY english, maori ASC"""
+                    FROM words WHERE cat_id=? ORDER BY english, maori"""
     elif search_filter == 'word_level_filter':
         query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
-                    FROM words WHERE cat_id=? ORDER BY word_level, maori ASC"""
+                    FROM words WHERE cat_id=? ORDER BY word_level, maori"""
     elif search_filter == 'recent_filter':
         query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
                     FROM words WHERE cat_id=? ORDER BY word_id DESC"""
     else:
         query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
-                    FROM words WHERE cat_id=? ORDER BY maori, english ASC"""
+                    FROM words WHERE cat_id=? ORDER BY maori, english"""
 
     cur = con.cursor()
 
@@ -339,7 +335,7 @@ def render_confirmdeletecatgeory_page(cat_id):
             print('delete category')
             flash('Category Successfully deleted')
             return redirect('/')  # return home
-        elif request.form['submit'] == 'DELETE CATEGORY AND WORDS WITHIN':
+        elif request.form['submit'] == 'DELETE CATEGORY AND ALL WORDS WITHIN':
             print('delete category and words')
 
             con = create_connection(DB_NAME)
@@ -377,8 +373,8 @@ def render_confirmdeletecatgeory_page(cat_id):
         return redirect('/')
 
     query = """SELECT word_id, cat_id
-    FROM words
-    WHERE cat_id=?"""
+        FROM words
+        WHERE cat_id=?"""
     cur = con.cursor()
     cur.execute(query, (cat_id,))
     words_number = cur.fetchall()
@@ -398,7 +394,7 @@ def render_word(word_id):
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
     query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added 
-            FROM words WHERE word_id=? ORDER BY maori ASC"""
+            FROM words WHERE word_id=? ORDER BY maori"""
     cur = con.cursor()
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
@@ -482,7 +478,7 @@ def render_editword_page(word_id):
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
     query = """SELECT word_id, maori, english, cat_id, definition, word_level, image 
-            FROM words WHERE word_id=? ORDER BY maori ASC"""
+            FROM words WHERE word_id=? ORDER BY maori"""
     cur = con.cursor()
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
@@ -493,7 +489,7 @@ def render_editword_page(word_id):
 
     query = """SELECT cat_id, category
     FROM categories 
-    ORDER BY category ASC"""
+    ORDER BY category"""
     cur = con.cursor()
     cur.execute(query)  # execute query
     cat_list = cur.fetchall()  # put results in list
@@ -528,7 +524,7 @@ def render_confirmdeleteword_page(word_id):
     # connect to the database to select information on selected word
     con = create_connection(DB_NAME)
     query = """SELECT word_id, maori, english, cat_id, definition, word_level, user_id, image, date_added
-            FROM words WHERE word_id=? ORDER BY maori ASC"""
+            FROM words WHERE word_id=? ORDER BY maori"""
     cur = con.cursor()
     cur.execute(query, (word_id,))  # execute query
     word_list = cur.fetchall()  # put results in list
@@ -791,7 +787,7 @@ def render_user_page():
     query = """SELECT word_id, maori, english, user_id, date_added
     FROM words
     WHERE user_id=?
-    ORDER BY date_added ASC"""
+    ORDER BY date_added"""
     cur = con.cursor()
     cur.execute(query, (session['user_id'],))
     user_words_info = cur.fetchall()
@@ -821,7 +817,7 @@ def render_userpublic_page(user_id):
     query = """SELECT word_id, maori, english, user_id, date_added
     FROM words
     WHERE user_id=?
-    ORDER BY date_added ASC"""
+    ORDER BY date_added"""
     cur = con.cursor()
     cur.execute(query, (user_id,))
     user_words_info = cur.fetchall()
@@ -919,7 +915,7 @@ def render_usersettings_page():
 @app.route('/changepassword', methods=['GET', 'POST'])
 # password change
 def render_changepassword_page():
-    # if isnt logged in then redirect user
+    # if isn't logged in then redirect user
     if not is_logged_in():
         flash('You are not logged in')
         return redirect('/')
@@ -985,7 +981,7 @@ def render_changepassword_page():
 @app.errorhandler(404)
 # 404 page
 def page_not_found(e):
-    return render_template('404.html', categories=get_categories(), logged_in=is_logged_in())
+    return render_template('404.html', e=e, categories=get_categories(), logged_in=is_logged_in())
 
 
 if __name__ == '__main__':

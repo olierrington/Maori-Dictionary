@@ -9,7 +9,15 @@
         <p style="color: white">Search by Maori word, English word, defintion, or word level<br><br></p>
         <div>
             <div><label for="search_query"></label></div>
-            <div><input type="text" name="search_query" id="search_query" placeholder="Search..."></div>
+            <div><input type="text"
+                        name="search_query"
+                        id="search_query"
+                        placeholder="Search..."
+                        {% if default_search != None and default_search != 'All Words' %}
+                            value="{{ default_search }}"
+                        {% endif %}
+                        autofocus>
+            </div>
         </div>
 
         <div>
