@@ -36,6 +36,16 @@ def get_categories():
     return category_list
 
 
+def is_logged_in():
+    # check if logged in by checking if session email is empty or not
+    if session.get("email") is None:
+        print("not logged in")
+        return False
+    else:  # if email isn't empty then user must be logged in
+        print("logged in")
+        return True
+
+
 @app.route('/', methods=["GET", "POST"])
 # home
 def render_homepage():
@@ -213,8 +223,20 @@ def render_addword(cat_id):
         definition = request.form['definition'].strip()
         word_level = request.form['word_level']
 
+        con = create_connection(DB_NAME)
+        query = """SELECT word_id, maori, english
+        FROM words
+        WHERE maori = ? or english = ?"""
+        cur = con.cursor()
+        cur.execute(query, (maori, english))
+        word_exists = cur.fetchall()
+        con.close()
+
         # data validation
-        if len(maori) > 20:
+        if len(word_exists) != 0:
+            flash('Word already exists in the Maori Dictionary!')
+            return redirect(request.referrer)
+        elif len(maori) > 20:
             flash('Maori word cannot be longer than 20 characters')
             return redirect(request.referrer)
         elif len(english) > 20:
@@ -682,7 +704,6 @@ def render_signup_page():
 
     # sign up form
     if request.method == 'POST':
-        print(request.form)
         # get info from form and clean it
         fname = request.form.get('fname').strip().title()
         lname = request.form.get('lname').strip().title()
@@ -754,16 +775,6 @@ def logout():
     print(list(session.keys()))
     flash('See you next time')
     return redirect('/')
-
-
-def is_logged_in():
-    # check if logged in by checking if session email is empty or not
-    if session.get("email") is None:
-        print("not logged in")
-        return False
-    else:  # if email isn't empty then user must be logged in
-        print("logged in")
-        return True
 
 
 @app.route('/user')
