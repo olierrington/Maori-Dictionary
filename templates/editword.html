@@ -27,7 +27,7 @@
                         {% for cat in cat_list %}
                             <option id="{{ cat[1] }}" value="{{ cat[1] }}">{{ cat[1] }}</option>
                         {% endfor %}
-                </select>
+                    </select>
                 </div>
             </div>
 
@@ -78,5 +78,16 @@
             document.getElementById('rangeValue').innerHTML = value;
         }
     </script>
+
+{% endblock %}
+
+{% block my_script%}
+<script>
+    $( document ).ready(function() {
+        $("[id^={{ word_cat[0][1] }}]").attr({
+            "selected" : "selected"
+        })
+    });
+</script>
 
 {% endblock %}

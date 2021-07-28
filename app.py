@@ -516,10 +516,17 @@ def render_editword_page(word_id):
     cur.execute(query)  # execute query
     cat_list = cur.fetchall()  # put results in list
 
+    query = """SELECT cat_id, category
+    FROM categories
+    WHERE cat_id=?"""
+    cur = con.cursor()
+    cur.execute(query, (word_list[0][3],))
+    word_cat = cur.fetchall()
+
     con.close()
 
     return render_template('editword.html', words=word_list, categories=get_categories(),
-                           logged_in=is_logged_in(), cat_list=cat_list)
+                           logged_in=is_logged_in(), cat_list=cat_list, word_cat=word_cat)
 
 
 @app.route('/confirmdeleteword/<word_id>', methods=["GET", "POST"])
